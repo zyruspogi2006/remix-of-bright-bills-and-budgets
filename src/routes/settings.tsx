@@ -133,7 +133,7 @@ function SettingsPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
-  const [importTarget, setImportTarget] = useState<ReturnType<typeof parseAppData> extends { ok: true; data: infer D } ? D : never | null>(null);
+  const [importTarget, setImportTarget] = useState<AppData | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const openForm = (cat: Category | null) => {
@@ -300,7 +300,6 @@ function SettingsPage() {
           />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          This backup holds {formatMoney(0, data.settings.currency) && ""}all your transactions, budgets, goals and bills ({Math.round(storageBytes(data) / 102.4) / 10} KB). Restoring replaces what's currently in this browser.
         </p>
         <ConfirmDialog
           open={!!importTarget}

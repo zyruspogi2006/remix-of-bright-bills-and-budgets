@@ -42,6 +42,9 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
   tag: Tag,
 };
 
+/** Used when a category's icon key isn't in the map (e.g. imported data). */
+export const FALLBACK_CATEGORY_ICON: LucideIcon = Tag;
+
 export const COLOR_CLASSES: Record<ColorKey, { soft: string; bar: string; dot: string }> = {
   c1: { soft: "bg-cat-1/15 text-cat-1", bar: "bg-cat-1", dot: "bg-cat-1" },
   c2: { soft: "bg-cat-2/15 text-cat-2", bar: "bg-cat-2", dot: "bg-cat-2" },

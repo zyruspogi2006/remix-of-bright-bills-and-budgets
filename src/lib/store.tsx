@@ -9,7 +9,7 @@ export const uid = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 type SaveState = { status: "idle" | "saving" | "saved" | "error"; at?: number; error?: string };
-type TxDialogState = { open: boolean; initial?: Partial<Transaction> };
+type TxDialogState = { open: boolean; initial?: Partial<Transaction> | undefined };
 
 function useStoreValue() {
   const [data, setData] = useState<AppData>(() => emptyData());

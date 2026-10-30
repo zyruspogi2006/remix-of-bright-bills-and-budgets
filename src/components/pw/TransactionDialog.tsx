@@ -13,6 +13,9 @@ import { ACCOUNTS, type TxType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { FieldError } from "./shared";
 
+type TxErrors = { amount: string | null; date: string | null; categoryId: string | null; note: string | null };
+const EMPTY_TX_ERRORS: TxErrors = { amount: null, date: null, categoryId: null, note: null };
+
 export function TransactionDialog() {
   const { txDialog, closeTransaction, data, upsertTransaction, today } = useStore();
   const initial = txDialog.initial;
@@ -24,7 +27,7 @@ export function TransactionDialog() {
   const [account, setAccount] = useState<string>("Cash");
   const [note, setNote] = useState("");
   const [recurring, setRecurring] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [errors, setErrors] = useState<TxErrors>(EMPTY_TX_ERRORS);
 
   useEffect(() => {
     if (!txDialog.open) return;
@@ -35,14 +38,14 @@ export function TransactionDialog() {
     setAccount(initial?.account ?? "Cash");
     setNote(initial?.note ?? "");
     setRecurring(initial?.recurring ?? false);
-    setErrors({});
+    setErrors(EMPTY_TX_ERRORS);
   }, [txDialog.open, initial, today]);
 
   const cats = data.categories.filter((c) => c.type === type);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const errs: Record<string, string | null> = {
+    const errs: TxErrors = {
       amount: validateAmount(amount),
       date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? null : "Pick a date",
       categoryId: cats.some((c) => c.id === categoryId) ? null : "Choose a category",

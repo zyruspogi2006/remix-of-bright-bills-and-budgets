@@ -98,7 +98,7 @@ function ReportsPage() {
                             {money(r.total)} <span className="text-xs font-normal text-muted-foreground">· {pct}%</span>
                           </p>
                         </div>
-                        <ProgressBar value={r.total} max={byCat[0].total} tone={i === 0 ? "primary" : "muted"} label={`${c.name} share of spending`} className="mt-1.5" />
+                        <ProgressBar value={r.total} max={byCat[0]?.total ?? 1} tone={i === 0 ? "primary" : "muted"} label={`${c.name} share of spending`} className="mt-1.5" />
                       </div>
                     </li>
                   );

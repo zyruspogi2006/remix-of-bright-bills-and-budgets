@@ -22,7 +22,7 @@ import { CategoryBadge, ConfirmDialog, FieldError, PageHeader, Panel } from "@/c
 import { parseAppData, storageBytes } from "@/lib/storage";
 import { todayISO, validateAmount } from "@/lib/finance";
 import { uid, useStore } from "@/lib/store";
-import { CATEGORY_ICONS, COLOR_CLASSES } from "@/lib/icons";
+import { CATEGORY_ICONS, COLOR_CLASSES, FALLBACK_CATEGORY_ICON } from "@/lib/icons";
 import { CURRENCIES, COLOR_KEYS, type AppData, type Category, type TxType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -91,7 +91,7 @@ function CategoryForm({ editing, onDone }: { editing: Category | null; onDone: (
           <SelectTrigger id="cat-icon"><SelectValue /></SelectTrigger>
           <SelectContent className="max-h-64">
             {ICON_NAMES.map((i) => {
-              const Icon = CATEGORY_ICONS[i];
+              const Icon = CATEGORY_ICONS[i] ?? FALLBACK_CATEGORY_ICON;
               return (
                 <SelectItem key={i} value={i}>
                   <span className="inline-flex items-center gap-2"><Icon className="size-4" aria-hidden /> {i}</span>

@@ -7,23 +7,23 @@ export const currentMonth = () => todayISO().slice(0, 7);
 
 export function parseISO(iso: string) {
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, (m || 1) - 1, d || 1);
+  return new Date(y ?? 0, (m ?? 1) - 1, d ?? 1);
 }
 
 export function shiftMonth(month: string, delta: number) {
   const [y, m] = month.split("-").map(Number);
-  return toISO(new Date(y, m - 1 + delta, 1)).slice(0, 7);
+  return toISO(new Date(y ?? 0, (m ?? 1) - 1 + delta, 1)).slice(0, 7);
 }
 
 export function monthRange(month: string): [string, string] {
   const [y, m] = month.split("-").map(Number);
-  const last = new Date(y, m, 0).getDate();
+  const last = new Date(y ?? 0, m ?? 1, 0).getDate();
   return [`${month}-01`, `${month}-${pad(last)}`];
 }
 
 export function monthLabel(month: string, short = false) {
   const [y, m] = month.split("-").map(Number);
-  return new Date(y, m - 1, 1).toLocaleDateString("en-PH", {
+  return new Date(y ?? 0, (m ?? 1) - 1, 1).toLocaleDateString("en-PH", {
     month: short ? "short" : "long",
     year: "numeric",
   });

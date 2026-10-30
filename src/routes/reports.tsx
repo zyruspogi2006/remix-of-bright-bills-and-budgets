@@ -1,10 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { ArrowDownLeft, ArrowUpRight, FileDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MonthSelector } from "@/components/pw/AppShell";
 import { CategoryBadge, EmptyState, Panel, PageHeader, ProgressBar } from "@/components/pw/shared";
-import { downloadFile, formatDate, inMonth, monthlyHistory, monthLabel, round2, summarize, totalsByCategory } from "@/lib/finance";
+import {
+  downloadFile,
+  inMonth,
+  monthlyHistory,
+  monthLabel,
+  summarize,
+  totalsByCategory,
+  transactionsToCSV,
+} from "@/lib/finance";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -33,24 +41,13 @@ function ReportsPage() {
   const target = data.settings.monthlySavingsTarget;
   const hasAny = data.transactions.length > 0;
 
-  const exportMonth = () => {
-    downloadFile(`pennywise-${month}.csv`, import_csv(txs), "text/csv;charset=utf-8");
-  };
-  const exportAll = () => {
-    downloadFile("pennywise-all-transactions.csv", import_csv(data.transactions), "text/csv;charset=utf-8");
-  };
-  const import_csv = (rows: typeof txs) => {
-    const { transactionsToCSV } = require_csv();
-    return transactionsToCSV(rows, data.categories, data.settings.currency);
+  const exportCSV = (rows: typeof data.transactions, label: string) => {
+    downloadFile(label, transactionsToCSV(rows, data.categories, data.settings.currency), "text/csv;charset=utf-8");
   };
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Reports"
-        description={`How {monthLabel(month)} went, and where the money went.`}
-        actions={<MonthSelector />}
-      />
+      <PageHeader title="Reports" description={`How ${monthLabel(month)} went, and where the money went.`} actions={<MonthSelector />} />
 
       {!hasAny ? (
         <Panel>
@@ -83,10 +80,7 @@ function ReportsPage() {
             </div>
           </div>
 
-          <Panel
-            title="Where the money went"
-            action={<span className="text-xs text-muted-foreground">{monthLabel(month)}</span>}
-          >
+          <Panel title="Where the money went" action={<span className="text-xs text-muted-foreground">{monthLabel(month)}</span>}>
             {byCat.length === 0 ? (
               <p className="text-sm text-muted-foreground">No expenses recorded this month.</p>
             ) : (
@@ -127,7 +121,7 @@ function ReportsPage() {
 
           <Panel title="Monthly history" action={<span className="text-xs text-muted-foreground">Last {history.length} month{history.length === 1 ? "" : "s"}</span>}>
             <div className="grid grid-cols-3 gap-2 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              <span className="col-span-1">Month</span>
+              <span>Month</span>
               <span className="text-right">In</span>
               <span className="text-right">Out</span>
             </div>
@@ -140,12 +134,10 @@ function ReportsPage() {
                     <span className="tabular text-right text-expense">{money(h.expense)}</span>
                   </div>
                   <div className="mt-1.5 flex h-1.5 gap-0.5 overflow-hidden rounded-full bg-muted">
-                    <div className="bg-income h-full" style={{ width: `${(h.income / maxMonth) * 100}%` }} />
-                    <div className="bg-expense h-full" style={{ width: `${(h.expense / maxMonth) * 100}%` }} />
+                    <div className="h-full bg-income" style={{ width: `${(h.income / maxMonth) * 100}%` }} />
+                    <div className="h-full bg-expense" style={{ width: `${(h.expense / maxMonth) * 100}%` }} />
                   </div>
-                  <p className={cn("tabular mt-1 text-xs", h.net < 0 ? "text-destructive" : "text-muted-foreground")}>
-                    Net: {money(h.net)}
-                  </p>
+                  <p className={cn("tabular mt-1 text-xs", h.net < 0 ? "text-destructive" : "text-muted-foreground")}>Net: {money(h.net)}</p>
                 </li>
               ))}
             </ul>
@@ -154,8 +146,12 @@ function ReportsPage() {
           <Panel title="Export">
             <p className="mb-3 text-sm text-muted-foreground">Download your data as a CSV file you can open in Excel or Google Sheets.</p>
             <div className="flex flex-wrap gap-2">
-              <Button onClick={exportMonth}><FileDown className="size-4" /> {monthLabel(month)} (CSV)</Button>
-              <Button variant="outline" onClick={exportAll}><FileDown className="size-4" /> All transactions (CSV)</Button>
+              <Button onClick={() => exportCSV(txs, `pennywise-${month}.csv`)}>
+                <FileDown className="size-4" /> {monthLabel(month)} (CSV)
+              </Button>
+              <Button variant="outline" onClick={() => exportCSV(data.transactions, "pennywise-all-transactions.csv")}>
+                <FileDown className="size-4" /> All transactions (CSV)
+              </Button>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
               Includes every transaction's date, category, amount, account and note.
@@ -167,9 +163,3 @@ function ReportsPage() {
     </div>
   );
 }
-
-function import_csv() {}
-function require_csv() {
-  return { transactionsToCSV: transactionsToCSVRef };
-}
-import { transactionsToCSV as transactionsToCSVRef } from "@/lib/finance";

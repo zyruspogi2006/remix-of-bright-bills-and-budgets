@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { CategoryBadge, ConfirmDialog, DemoTag, EmptyState, FieldError, PageHeader } from "@/components/pw/shared";
-import { billStatus, daysBetween, formatDate, round2, todayISO, validateAmount } from "@/lib/finance";
+import { addMonthsISO, billStatus, daysBetween, formatDate, round2, validateAmount } from "@/lib/finance";
 import { uid, useStore } from "@/lib/store";
 import type { Bill } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,10 @@ export const Route = createFileRoute("/bills")({
   component: BillsPage,
 });
 
-function BillDialog({ open, onOpenChange, initial }: { open: boolean; onOpenChange: (o: boolean) => void; initial?: Partial<Bill> }) {
+type BillErrors = { name: string | null; amount: string | null; dueDate: string | null; categoryId: string | null };
+const EMPTY_BILL_ERRORS: BillErrors = { name: null, amount: null, dueDate: null, categoryId: null };
+
+function BillDialog({ open, onOpenChange, initial }: { open: boolean; onOpenChange: (o: boolean) => void; initial?: Partial<Bill> | undefined }) {
   const { data, upsertBill, today } = useStore();
   const editing = Boolean(initial?.id);
   const [name, setName] = useState("");
@@ -36,7 +39,7 @@ function BillDialog({ open, onOpenChange, initial }: { open: boolean; onOpenChan
   const [dueDate, setDueDate] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [recurring, setRecurring] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [errors, setErrors] = useState<BillErrors>(EMPTY_BILL_ERRORS);
   const expenseCats = data.categories.filter((c) => c.type === "expense");
 
   useEffect(() => {
@@ -46,12 +49,12 @@ function BillDialog({ open, onOpenChange, initial }: { open: boolean; onOpenChan
     setDueDate(initial?.dueDate ?? "");
     setCategoryId(initial?.categoryId ?? "");
     setRecurring(initial?.recurring ?? false);
-    setErrors({});
+    setErrors(EMPTY_BILL_ERRORS);
   }, [open, initial]);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const errs = {
+    const errs: BillErrors = {
       name: name.trim() ? (name.trim().length > 60 ? "Keep the name under 60 characters" : null) : "Give the bill a name",
       amount: validateAmount(amount),
       dueDate: /^\d{4}-\d{2}-\d{2}$/.test(dueDate) ? null : "Pick a due date",
@@ -209,7 +212,7 @@ function BillsPage() {
                         <Check className="size-4" /> Mark paid
                       </Button>
                       {b.recurring && (
-                        <Button size="sm" variant="ghost" onClick={() => { advanceBill(b.id); toast.success(`Next “${b.name}” due ${formatDate(addMonth(b.dueDate))}`); }}>
+                        <Button size="sm" variant="ghost" onClick={() => { advanceBill(b.id); toast.success(`Next “${b.name}” due ${formatDate(addMonthsISO(b.dueDate, 1))}`); }}>
                           <RedoDot className="size-4" /> Paid, next month
                         </Button>
                       )}
@@ -248,11 +251,3 @@ function BillsPage() {
   );
 }
 
-function addMonth(iso: string) {
-  const d = todayISO();
-  void d;
-  const [y, m, day] = iso.split("-").map(Number);
-  const target = new Date(y, m, 1);
-  const last = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
-  return `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, "0")}-${String(Math.min(day, last)).padStart(2, "0")}`;
-}

@@ -23,7 +23,7 @@ import { parseAppData, storageBytes } from "@/lib/storage";
 import { formatMoney, todayISO, validateAmount } from "@/lib/finance";
 import { uid, useStore } from "@/lib/store";
 import { CATEGORY_ICONS, COLOR_CLASSES } from "@/lib/icons";
-import { CURRENCIES, COLOR_KEYS, type Category, type TxType } from "@/lib/types";
+import { CURRENCIES, COLOR_KEYS, type AppData, type Category, type TxType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/settings")({

@@ -26,25 +26,28 @@ export const Route = createFileRoute("/goals")({
   component: GoalsPage,
 });
 
-function GoalDialog({ open, onOpenChange, initial }: { open: boolean; onOpenChange: (o: boolean) => void; initial?: Partial<Goal> }) {
+type GoalErrors = { name: string | null; target: string | null; targetDate: string | null };
+const EMPTY_GOAL_ERRORS: GoalErrors = { name: null, target: null, targetDate: null };
+
+function GoalDialog({ open, onOpenChange, initial }: { open: boolean; onOpenChange: (o: boolean) => void; initial?: Partial<Goal> | undefined }) {
   const { upsertGoal, today } = useStore();
   const editing = Boolean(initial?.id);
   const [name, setName] = useState("");
   const [target, setTarget] = useState("");
   const [targetDate, setTargetDate] = useState("");
-  const [errors, setErrors] = useState<Record<string, string | null>>({});
+  const [errors, setErrors] = useState<GoalErrors>(EMPTY_GOAL_ERRORS);
 
   useEffect(() => {
     if (!open) return;
     setName(initial?.name ?? "");
     setTarget(initial?.target ? String(initial.target) : "");
     setTargetDate(initial?.targetDate ?? "");
-    setErrors({});
+    setErrors(EMPTY_GOAL_ERRORS);
   }, [open, initial]);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const errs = {
+    const errs: GoalErrors = {
       name: name.trim() ? (name.trim().length > 60 ? "Keep the name under 60 characters" : null) : "Give the goal a name",
       target: validateAmount(target),
       targetDate: /^\d{4}-\d{2}-\d{2}$/.test(targetDate) ? null : "Pick a target date",

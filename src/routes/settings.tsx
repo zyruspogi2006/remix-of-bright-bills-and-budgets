@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { CategoryBadge, ConfirmDialog, FieldError, PageHeader, Panel } from "@/components/pw/shared";
 import { parseAppData, storageBytes } from "@/lib/storage";
-import { formatMoney, todayISO, validateAmount } from "@/lib/finance";
+import { todayISO, validateAmount } from "@/lib/finance";
 import { uid, useStore } from "@/lib/store";
 import { CATEGORY_ICONS, COLOR_CLASSES } from "@/lib/icons";
 import { CURRENCIES, COLOR_KEYS, type AppData, type Category, type TxType } from "@/lib/types";
@@ -300,6 +300,7 @@ function SettingsPage() {
           />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
+          This backup holds all your transactions, budgets, goals and bills ({Math.round(storageBytes(data) / 102.4) / 10} KB). Restoring replaces what's currently in this browser.
         </p>
         <ConfirmDialog
           open={!!importTarget}

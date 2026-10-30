@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
-import { CATEGORY_ICONS, COLOR_CLASSES } from "@/lib/icons";
+import { CATEGORY_ICONS, COLOR_CLASSES, FALLBACK_CATEGORY_ICON } from "@/lib/icons";
 import type { Category } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -68,7 +68,7 @@ export function ProgressBar({ value, max, tone = "primary", label, className, si
 }
 
 export function CategoryBadge({ category, size = "md" }: { category: Category; size?: "sm" | "md" }) {
-  const Icon = CATEGORY_ICONS[category.icon] ?? CATEGORY_ICONS.tag;
+  const Icon = CATEGORY_ICONS[category.icon] ?? FALLBACK_CATEGORY_ICON;
   return (
     <span className={cn("inline-flex shrink-0 items-center justify-center rounded-xl", COLOR_CLASSES[category.color].soft, size === "sm" ? "size-8" : "size-10")} aria-hidden>
       <Icon className={size === "sm" ? "size-4" : "size-5"} />

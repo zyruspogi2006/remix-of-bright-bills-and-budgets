@@ -69,16 +69,16 @@ function filterValid<T>(schema: z.ZodType<T, z.ZodTypeDef, unknown>, arr: unknow
 /** Bring any older shape up to the current version. */
 export function migrate(raw: Record<string, unknown>): Record<string, unknown> {
   const out = { ...raw };
-  const version = typeof out.version === "number" ? out.version : 0;
+  const version = typeof out["version"] === "number" ? out["version"] : 0;
   if (version < 1) {
     // v0: budgets were a single number "monthlyBudget"; categoryBudgets lived at top-level.
-    if (!out.budgets) {
-      out.budgets = {
-        overall: typeof out.monthlyBudget === "number" ? out.monthlyBudget : 0,
-        byCategory: (out.categoryBudgets as Record<string, number>) ?? {},
+    if (!out["budgets"]) {
+      out["budgets"] = {
+        overall: typeof out["monthlyBudget"] === "number" ? out["monthlyBudget"] : 0,
+        byCategory: (out["categoryBudgets"] as Record<string, number>) ?? {},
       };
     }
-    out.version = 1;
+    out["version"] = 1;
   }
   return out;
 }
@@ -89,17 +89,17 @@ export type ParseResult = { ok: true; data: AppData; dropped: number } | { ok: f
 export function parseAppData(input: unknown): ParseResult {
   if (!input || typeof input !== "object" || Array.isArray(input)) return { ok: false, error: "Not a Pennywise backup (expected an object)." };
   const obj = migrate(input as Record<string, unknown>);
-  if ((obj.version as number) > CURRENT_VERSION) return { ok: false, error: "This backup is from a newer version of Pennywise." };
+  if ((obj["version"] as number) > CURRENT_VERSION) return { ok: false, error: "This backup is from a newer version of Pennywise." };
   const looksRight = ["transactions", "categories", "settings"].some((k) => k in obj);
   if (!looksRight) return { ok: false, error: "File doesn't contain Pennywise data." };
 
   const base = emptyData();
-  const cats = filterValid(categorySchema, obj.categories);
-  const txs = filterValid(txSchema, obj.transactions);
-  const goals = filterValid(goalSchema, obj.goals);
-  const bills = filterValid(billSchema, obj.bills);
-  const settings = settingsSchema.safeParse(obj.settings ?? {});
-  const b = (obj.budgets ?? {}) as { overall?: unknown; byCategory?: unknown };
+  const cats = filterValid(categorySchema, obj["categories"]);
+  const txs = filterValid(txSchema, obj["transactions"]);
+  const goals = filterValid(goalSchema, obj["goals"]);
+  const bills = filterValid(billSchema, obj["bills"]);
+  const settings = settingsSchema.safeParse(obj["settings"] ?? {});
+  const b = (obj["budgets"] ?? {}) as { overall?: unknown; byCategory?: unknown };
   const byCategory: Record<string, number> = {};
   if (b.byCategory && typeof b.byCategory === "object") {
     for (const [k, v] of Object.entries(b.byCategory as Record<string, unknown>)) {

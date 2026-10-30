@@ -127,7 +127,7 @@ function CategoryForm({ editing, onDone }: { editing: Category | null; onDone: (
 
 function SettingsPage() {
   const store = useStore();
-  const { data, updateSettings, upsertCategory, deleteCategory, loadDemo, clearDemo, demoActive, resetAll, replaceAll, money } = store;
+  const { data, updateSettings, upsertCategory, deleteCategory, loadDemo, clearDemo, demoActive, resetAll, replaceAll } = store;
   const [editing, setEditing] = useState<Category | null>(null);
   const [adding, setAdding] = useState(false);
   const [formOpen, setFormOpen] = useState(false);

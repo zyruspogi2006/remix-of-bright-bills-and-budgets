@@ -22,7 +22,7 @@ export interface Transaction {
   account: string;
   note: string;
   recurring: boolean;
-  demo?: boolean;
+  demo?: boolean | undefined;
 }
 
 export interface Contribution {
@@ -38,7 +38,7 @@ export interface Goal {
   current: number;
   targetDate: string;
   contributions: Contribution[];
-  demo?: boolean;
+  demo?: boolean | undefined;
 }
 
 export interface Bill {
@@ -49,7 +49,7 @@ export interface Bill {
   categoryId: string;
   recurring: boolean;
   paid: boolean;
-  demo?: boolean;
+  demo?: boolean | undefined;
 }
 
 export type ThemePref = "light" | "dark" | "system";
